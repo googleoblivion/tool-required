@@ -52,7 +52,7 @@ public class ToolRequiredPlugin extends Plugin
 	private Item[] inventoryItems = new Item[0];
 
 	@Getter
-	private Item[] playerItems;
+	private Item[] playerItems = new Item[0];
 
 	private static final AnyRequirementCollection ANY_AXE = any("Any Axe",
 			item(ItemID.IRON_AXE),
