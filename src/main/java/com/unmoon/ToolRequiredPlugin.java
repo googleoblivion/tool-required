@@ -5,14 +5,14 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-import net.runelite.api.ItemID;
 import net.runelite.api.Menu;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.PostMenuSort;
+import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -52,7 +52,7 @@ public class ToolRequiredPlugin extends Plugin
 	private Item[] inventoryItems = new Item[0];
 
 	@Getter
-	private Item[] playerItems;
+	private Item[] playerItems = new Item[0];
 
 	private static final int BARBARIAN_HARVESTING_VARBIT = 12345; // TODO: replace with actual relic varbit.
 
@@ -70,33 +70,33 @@ public class ToolRequiredPlugin extends Plugin
 			item(ItemID.RUNE_AXE),
 			item(ItemID.BLACK_AXE),
 			item(ItemID.DRAGON_AXE),
-			item(ItemID.BLESSED_AXE),
+			item(ItemID.ANMA_AXE),
 			item(ItemID.INFERNAL_AXE),
-			item(ItemID.INFERNAL_AXE_UNCHARGED),
-			item(ItemID._3RD_AGE_AXE),
-			item(ItemID.GILDED_AXE),
+			item(ItemID.INFERNAL_AXE_EMPTY),
+			item(ItemID._3A_AXE),
+			item(ItemID.TRAIL_GILDED_AXE),
 			item(ItemID.CRYSTAL_AXE),
 			item(ItemID.CRYSTAL_AXE_INACTIVE),
-			item(ItemID.CORRUPTED_AXE),
-			item(ItemID.CRYSTAL_AXE_23862),
-			item(ItemID.INFERNAL_AXE_OR),
-			item(ItemID.ECHO_AXE),
-			item(ItemID.INFERNAL_AXE_UNCHARGED_25371),
-			item(ItemID.DRAGON_AXE_OR),
-			item(ItemID.BRONZE_FELLING_AXE),
-			item(ItemID.IRON_FELLING_AXE),
-			item(ItemID.STEEL_FELLING_AXE),
-			item(ItemID.BLACK_FELLING_AXE),
-			item(ItemID.MITHRIL_FELLING_AXE),
-			item(ItemID.ADAMANT_FELLING_AXE),
-			item(ItemID.RUNE_FELLING_AXE),
-			item(ItemID.DRAGON_FELLING_AXE),
-			item(ItemID.CRYSTAL_FELLING_AXE),
-			item(ItemID.CRYSTAL_FELLING_AXE_INACTIVE),
-			item(ItemID._3RD_AGE_FELLING_AXE),
-			item(ItemID.INFERNAL_AXE_OR_30347),
-			item(ItemID.INFERNAL_AXE_UNCHARGED_30348),
-			item(ItemID.DRAGON_AXE_OR_30352)
+			item(ItemID.GAUNTLET_AXE_HM),
+			item(ItemID.GAUNTLET_AXE),
+			item(ItemID.TRAILBLAZER_AXE),
+			item(ItemID.LEAGUE_TRAILBLAZER_AXE),
+			item(ItemID.TRAILBLAZER_AXE_EMPTY),
+			item(ItemID.TRAILBLAZER_AXE_NO_INFERNAL),
+			item(ItemID.BRONZE_AXE_2H),
+			item(ItemID.IRON_AXE_2H),
+			item(ItemID.STEEL_AXE_2H),
+			item(ItemID.BLACK_AXE_2H),
+			item(ItemID.MITHRIL_AXE_2H),
+			item(ItemID.ADAMANT_AXE_2H),
+			item(ItemID.RUNE_AXE_2H),
+			item(ItemID.DRAGON_AXE_2H),
+			item(ItemID.CRYSTAL_AXE_2H),
+			item(ItemID.CRYSTAL_AXE_2H_INACTIVE),
+			item(ItemID._3A_AXE_2H),
+			item(ItemID.TRAILBLAZER_RELOADED_AXE),
+			item(ItemID.TRAILBLAZER_RELOADED_AXE_EMPTY),
+			item(ItemID.TRAILBLAZER_RELOADED_AXE_NO_INFERNAL)
 	);
 
 	private static final AnyRequirementCollection ANY_PICKAXE = any("Any Pickaxe",
@@ -106,28 +106,28 @@ public class ToolRequiredPlugin extends Plugin
 			item(ItemID.ADAMANT_PICKAXE),
 			item(ItemID.MITHRIL_PICKAXE),
 			item(ItemID.RUNE_PICKAXE),
-			item(ItemID.RUNE_PICKAXE_NZ),
-			item(ItemID.MITHRIL_PICKAXE_NZ),
-			item(ItemID.IRON_PICKAXE_NZ),
+			item(ItemID.NZONE_RUNE_PICKAXE),
+			item(ItemID.NZONE_MITHRIL_PICKAXE),
+			item(ItemID.NZONE_IRON_PICKAXE),
 			item(ItemID.DRAGON_PICKAXE),
 			item(ItemID.BLACK_PICKAXE),
-			item(ItemID.DRAGON_PICKAXE_12797),
+			item(ItemID.DRAGON_PICKAXE_PRETTY),
 			item(ItemID.INFERNAL_PICKAXE),
-			item(ItemID.INFERNAL_PICKAXE_UNCHARGED),
-			item(ItemID._3RD_AGE_PICKAXE),
-			item(ItemID.GILDED_PICKAXE),
-			item(ItemID.DRAGON_PICKAXE_OR),
+			item(ItemID.INFERNAL_PICKAXE_EMPTY),
+			item(ItemID._3A_PICKAXE),
+			item(ItemID.TRAIL_GILDED_PICKAXE),
+			item(ItemID.ZALCANO_PICKAXE),
 			item(ItemID.CRYSTAL_PICKAXE),
 			item(ItemID.CRYSTAL_PICKAXE_INACTIVE),
-			item(ItemID.CORRUPTED_PICKAXE),
-			item(ItemID.CRYSTAL_PICKAXE_23863),
-			item(ItemID.INFERNAL_PICKAXE_OR),
-			item(ItemID.ECHO_PICKAXE),
-			item(ItemID.INFERNAL_PICKAXE_UNCHARGED_25369),
-			item(ItemID.DRAGON_PICKAXE_OR_25376),
-			item(ItemID.INFERNAL_PICKAXE_OR_30345),
-			item(ItemID.INFERNAL_PICKAXE_UNCHARGED_30346),
-			item(ItemID.DRAGON_PICKAXE_OR_30351)
+			item(ItemID.GAUNTLET_PICKAXE_HM),
+			item(ItemID.GAUNTLET_PICKAXE),
+			item(ItemID.TRAILBLAZER_PICKAXE),
+			item(ItemID.LEAGUE_TRAILBLAZER_PICKAXE),
+			item(ItemID.TRAILBLAZER_PICKAXE_EMPTY),
+			item(ItemID.TRAILBLAZER_PICKAXE_NO_INFERNAL),
+			item(ItemID.TRAILBLAZER_RELOADED_PICKAXE),
+			item(ItemID.TRAILBLAZER_RELOADED_PICKAXE_EMPTY),
+			item(ItemID.TRAILBLAZER_RELOADED_PICKAXE_NO_INFERNAL)
 	);
 	private final Set<String> cutOverrides = Sets.newHashSet("Sulliuscep");
 	private final Set<String> chopOverrides = Sets.newHashSet(
@@ -139,14 +139,14 @@ public class ToolRequiredPlugin extends Plugin
 	public void onItemContainerChanged(final ItemContainerChanged event)
 	{
 		final ItemContainer itemContainer = event.getItemContainer();
-		if (event.getContainerId() == InventoryID.EQUIPMENT.getId())
+		if (event.getContainerId() == InventoryID.WORN)
 		{
 			equippedItems = itemContainer.getItems();
 			playerItems = new Item[equippedItems.length + inventoryItems.length];
 			System.arraycopy(equippedItems, 0, playerItems, 0, equippedItems.length);
 			System.arraycopy(inventoryItems, 0, playerItems, equippedItems.length, inventoryItems.length);
 		}
-		else if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
+		else if (event.getContainerId() == InventoryID.INV) {
 			inventoryItems = itemContainer.getItems();
 			playerItems = new Item[equippedItems.length + inventoryItems.length];
 			System.arraycopy(equippedItems, 0, playerItems, 0, equippedItems.length);
