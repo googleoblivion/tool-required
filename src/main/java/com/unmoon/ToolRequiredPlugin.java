@@ -20,6 +20,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.cluescrolls.clues.item.AnyRequirementCollection;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.Set;
 
 import static net.runelite.api.MenuAction.GAME_OBJECT_FIRST_OPTION;
@@ -54,6 +55,8 @@ public class ToolRequiredPlugin extends Plugin
 	@Getter
 	private Item[] playerItems = new Item[0];
 
+	private static final String CANOE_STATION = "canoe station";
+
 	private boolean hasStoredCanoeAxe()
 	{
 		final ItemContainer canoeAxeContainer = client.getItemContainer(InventoryID.CANOE_AXE);
@@ -73,15 +76,16 @@ public class ToolRequiredPlugin extends Plugin
 		return false;
 	}
 
-	private boolean isCanoeStation(String target)
+	private String normalizeTarget(String target)
 	{
-		return "Canoe Station".equalsIgnoreCase(target);
+		return target.toLowerCase(Locale.ENGLISH);
 	}
 
 	private boolean hasAxeForTarget(String target)
 	{
+		final String normalizedTarget = normalizeTarget(target);
 		return ANY_AXE.fulfilledBy(playerItems)
-			|| isCanoeStation(target) && hasStoredCanoeAxe();
+			|| axeStorageTargets.contains(normalizedTarget) && hasStoredCanoeAxe();
 	}
 
 	private static final AnyRequirementCollection ANY_AXE = any("Any Axe",
@@ -152,10 +156,13 @@ public class ToolRequiredPlugin extends Plugin
 			item(ItemID.TRAILBLAZER_RELOADED_PICKAXE_EMPTY),
 			item(ItemID.TRAILBLAZER_RELOADED_PICKAXE_NO_INFERNAL)
 	);
-	private final Set<String> cutOverrides = Sets.newHashSet("Sulliuscep");
+	private final Set<String> cutOverrides = Sets.newHashSet("sulliuscep");
 	private final Set<String> chopOverrides = Sets.newHashSet(
-			"Jungle Bush", "Pineapple plant", "Canoe Station", "Vines", "Tendrils", "Bruma roots",
-			"Rotten sapling", "Sapling", "Thick vine", "Thick vines", "Corrupt Phren Roots", "Phren Roots"
+			"jungle bush", "pineapple plant", "vines", "tendrils", "bruma roots",
+			"rotten sapling", "sapling", "thick vine", "thick vines", "corrupt phren roots", "phren roots"
+	);
+	private final Set<String> axeStorageTargets = Sets.newHashSet(
+			CANOE_STATION
 	);
 
 	@Subscribe
@@ -189,8 +196,10 @@ public class ToolRequiredPlugin extends Plugin
 			if (entry.getType() != GAME_OBJECT_FIRST_OPTION) {continue;}
 			if (config.chopDown()) {
 				String target = removeTags(entry.getTarget());
-				boolean isTreeTarget = target.contains("ree") || chopOverrides.contains(target) || isCanoeStation(target);
-				// target.contains("ree") is Tree check (without the T because of case-sensitive)
+				String normalizedTarget = normalizeTarget(target);
+				boolean isTreeTarget = normalizedTarget.contains("tree")
+					|| chopOverrides.contains(normalizedTarget)
+					|| axeStorageTargets.contains(normalizedTarget);
 				if (entry.getOption().startsWith("Chop")
 					&& isTreeTarget
 					&& !hasAxeForTarget(target)) {
@@ -201,7 +210,7 @@ public class ToolRequiredPlugin extends Plugin
 					continue;
 				}
 				else if (entry.getOption().startsWith("Cut")
-					&& (target.contains("ree") || cutOverrides.contains(target))
+					&& (normalizedTarget.contains("tree") || cutOverrides.contains(normalizedTarget))
 					&& !ANY_AXE.fulfilledBy(playerItems)) {
 					root.removeMenuEntry(entry);
 					// removeMenuEntry will set `entry` to a different, potentially to-be-removed option,
