@@ -13,6 +13,7 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.PostMenuSort;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -54,11 +55,11 @@ public class ToolRequiredPlugin extends Plugin
 	@Getter
 	private Item[] playerItems = new Item[0];
 
-	private static final int BARBARIAN_HARVESTING_VARBIT = 12345; // TODO: replace with actual relic varbit.
+	private static final int LEAGUE_TIER_ONE_RELIC_SELECTION = VarbitID.LEAGUE_RELIC_SELECTION_0;
 
 	private boolean hasSeasonalRelic(){
 		return client.getWorldType().contains(net.runelite.api.WorldType.SEASONAL)
-			&& client.getVarbitValue(BARBARIAN_HARVESTING_VARBIT) == 1;
+			&& client.getVarbitValue(LEAGUE_TIER_ONE_RELIC_SELECTION) == 1; //TODO: determine if 1 is correct for BARBARIAN_GATHERER
 	}
 
 	private static final AnyRequirementCollection ANY_AXE = any("Any Axe",
