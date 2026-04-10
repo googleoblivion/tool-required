@@ -21,6 +21,7 @@ import net.runelite.client.plugins.cluescrolls.clues.item.AnyRequirementCollecti
 
 import javax.inject.Inject;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import static net.runelite.api.MenuAction.GAME_OBJECT_FIRST_OPTION;
@@ -55,17 +56,15 @@ public class ToolRequiredPlugin extends Plugin
 	@Getter
 	private Item[] playerItems = new Item[0];
 
-	private static final String CANOE_STATION = "canoe station";
-
-	private boolean hasStoredCanoeAxe()
+	private boolean hasStoredTool(int inventoryId)
 	{
-		final ItemContainer canoeAxeContainer = client.getItemContainer(InventoryID.CANOE_AXE);
-		if (canoeAxeContainer == null)
+		final ItemContainer toolContainer = client.getItemContainer(inventoryId);
+		if (toolContainer == null)
 		{
 			return false;
 		}
 
-		for (Item item : canoeAxeContainer.getItems())
+		for (Item item : toolContainer.getItems())
 		{
 			if (item != null && item.getId() > 0 && item.getQuantity() > 0)
 			{
@@ -84,8 +83,9 @@ public class ToolRequiredPlugin extends Plugin
 	private boolean hasAxeForTarget(String target)
 	{
 		final String normalizedTarget = normalizeTarget(target);
+		final Integer storageInventoryId = axeStorageTargets.get(normalizedTarget);
 		return ANY_AXE.fulfilledBy(playerItems)
-			|| axeStorageTargets.contains(normalizedTarget) && hasStoredCanoeAxe();
+			|| storageInventoryId != null && hasStoredTool(storageInventoryId);
 	}
 
 	private static final AnyRequirementCollection ANY_AXE = any("Any Axe",
@@ -161,8 +161,8 @@ public class ToolRequiredPlugin extends Plugin
 			"jungle bush", "pineapple plant", "vines", "tendrils", "bruma roots",
 			"rotten sapling", "sapling", "thick vine", "thick vines", "corrupt phren roots", "phren roots"
 	);
-	private final Set<String> axeStorageTargets = Sets.newHashSet(
-			CANOE_STATION
+	private final Map<String, Integer> axeStorageTargets = Map.of(
+			"canoe station", InventoryID.CANOE_AXE
 	);
 
 	@Subscribe
@@ -199,7 +199,7 @@ public class ToolRequiredPlugin extends Plugin
 				String normalizedTarget = normalizeTarget(target);
 				boolean isTreeTarget = normalizedTarget.contains("tree")
 					|| chopOverrides.contains(normalizedTarget)
-					|| axeStorageTargets.contains(normalizedTarget);
+					|| axeStorageTargets.containsKey(normalizedTarget);
 				if (entry.getOption().startsWith("Chop")
 					&& isTreeTarget
 					&& !hasAxeForTarget(target)) {
