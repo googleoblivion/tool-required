@@ -61,6 +61,31 @@ public class ToolRequiredPlugin extends Plugin
 			&& client.getVarbitValue(BARBARIAN_HARVESTING_VARBIT) == 1;
 	}
 
+	private boolean hasStoredCanoeAxe()
+	{
+		final ItemContainer canoeAxeContainer = client.getItemContainer(InventoryID.CANOE_AXE);
+		if (canoeAxeContainer == null)
+		{
+			return false;
+		}
+
+		for (Item item : canoeAxeContainer.getItems())
+		{
+			if (item != null && item.getId() > 0 && item.getQuantity() > 0)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean hasAxeForTarget(String target)
+	{
+		return ANY_AXE.fulfilledBy(playerItems)
+			|| "Canoe Station".equals(target) && hasStoredCanoeAxe();
+	}
+
 	private static final AnyRequirementCollection ANY_AXE = any("Any Axe",
 			item(ItemID.IRON_AXE),
 			item(ItemID.BRONZE_AXE),
@@ -168,16 +193,18 @@ public class ToolRequiredPlugin extends Plugin
 			if (config.chopDown() && !seasonalRelic) {
 				String target = removeTags(entry.getTarget());
 				// target.contains("ree") is Tree check (without the T because of case-sensitive)
-				if (entry.getOption().startsWith("Chop") && !ANY_AXE.fulfilledBy(playerItems)
-					&& (target.contains("ree") || chopOverrides.contains(target))) {
+				if (entry.getOption().startsWith("Chop")
+					&& (target.contains("ree") || chopOverrides.contains(target))
+					&& !hasAxeForTarget(target)) {
 					root.removeMenuEntry(entry);
 					// removeMenuEntry will set `entry` to a different, potentially to-be-removed option,
 					// but we need to continue iteration instead of calling removeMenuEntry again, or we will
 					// end up with duplicated menu entries (which is bad).
 					continue;
 				}
-				else if (entry.getOption().startsWith("Cut") && !ANY_AXE.fulfilledBy(playerItems)
-					&& (target.contains("ree") || cutOverrides.contains(target))) {
+				else if (entry.getOption().startsWith("Cut")
+					&& (target.contains("ree") || cutOverrides.contains(target))
+					&& !ANY_AXE.fulfilledBy(playerItems)) {
 					root.removeMenuEntry(entry);
 					// removeMenuEntry will set `entry` to a different, potentially to-be-removed option,
 					// but we need to continue iteration instead of calling removeMenuEntry again, or we will
