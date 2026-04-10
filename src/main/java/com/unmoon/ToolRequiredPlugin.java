@@ -161,20 +161,23 @@ public class ToolRequiredPlugin extends Plugin
 
 		Menu root = client.getMenu();
 		MenuEntry[] entries = root.getMenuEntries();
+		final boolean seasonalRelic = hasSeasonalRelic();
 
 		for (MenuEntry entry : entries) {
 			if (entry.getType() != GAME_OBJECT_FIRST_OPTION) {continue;}
-			if (config.chopDown() && !ANY_AXE.fulfilledBy(playerItems) && !hasSeasonalRelic()) {
+			if (config.chopDown() && !seasonalRelic) {
 				String target = removeTags(entry.getTarget());
 				// target.contains("ree") is Tree check (without the T because of case-sensitive)
-				if (entry.getOption().startsWith("Chop") && (target.contains("ree") || chopOverrides.contains(target))) {
+				if (entry.getOption().startsWith("Chop") && !ANY_AXE.fulfilledBy(playerItems)
+					&& (target.contains("ree") || chopOverrides.contains(target))) {
 					root.removeMenuEntry(entry);
 					// removeMenuEntry will set `entry` to a different, potentially to-be-removed option,
 					// but we need to continue iteration instead of calling removeMenuEntry again, or we will
 					// end up with duplicated menu entries (which is bad).
 					continue;
 				}
-				else if (entry.getOption().startsWith("Cut") && (target.contains("ree") || cutOverrides.contains(target))) {
+				else if (entry.getOption().startsWith("Cut") && !ANY_AXE.fulfilledBy(playerItems)
+					&& (target.contains("ree") || cutOverrides.contains(target))) {
 					root.removeMenuEntry(entry);
 					// removeMenuEntry will set `entry` to a different, potentially to-be-removed option,
 					// but we need to continue iteration instead of calling removeMenuEntry again, or we will
@@ -182,7 +185,7 @@ public class ToolRequiredPlugin extends Plugin
 					continue;
 				}
 			}
-			if (config.mine() && entry.getOption().equals("Mine") && !ANY_PICKAXE.fulfilledBy(playerItems) && !hasSeasonalRelic()) {
+			if (config.mine() && entry.getOption().equals("Mine") && !ANY_PICKAXE.fulfilledBy(playerItems) && !seasonalRelic) {
 				root.removeMenuEntry(entry);
 			}
 		}
