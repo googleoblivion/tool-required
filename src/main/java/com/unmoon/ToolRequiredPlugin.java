@@ -54,13 +54,6 @@ public class ToolRequiredPlugin extends Plugin
 	@Getter
 	private Item[] playerItems = new Item[0];
 
-	private static final int BARBARIAN_HARVESTING_VARBIT = 12345; // TODO: replace with actual relic varbit.
-
-	private boolean hasSeasonalRelic(){
-		return client.getWorldType().contains(net.runelite.api.WorldType.SEASONAL)
-			&& client.getVarbitValue(BARBARIAN_HARVESTING_VARBIT) == 1;
-	}
-
 	private boolean hasStoredCanoeAxe()
 	{
 		final ItemContainer canoeAxeContainer = client.getItemContainer(InventoryID.CANOE_AXE);
@@ -191,11 +184,10 @@ public class ToolRequiredPlugin extends Plugin
 
 		Menu root = client.getMenu();
 		MenuEntry[] entries = root.getMenuEntries();
-		final boolean seasonalRelic = hasSeasonalRelic();
 
 		for (MenuEntry entry : entries) {
 			if (entry.getType() != GAME_OBJECT_FIRST_OPTION) {continue;}
-			if (config.chopDown() && !seasonalRelic) {
+			if (config.chopDown()) {
 				String target = removeTags(entry.getTarget());
 				boolean isTreeTarget = target.contains("ree") || chopOverrides.contains(target) || isCanoeStation(target);
 				// target.contains("ree") is Tree check (without the T because of case-sensitive)
@@ -218,7 +210,7 @@ public class ToolRequiredPlugin extends Plugin
 					continue;
 				}
 			}
-			if (config.mine() && entry.getOption().equals("Mine") && !ANY_PICKAXE.fulfilledBy(playerItems) && !seasonalRelic) {
+			if (config.mine() && entry.getOption().equals("Mine") && !ANY_PICKAXE.fulfilledBy(playerItems)) {
 				root.removeMenuEntry(entry);
 			}
 		}
