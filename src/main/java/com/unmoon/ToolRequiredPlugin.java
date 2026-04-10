@@ -80,10 +80,15 @@ public class ToolRequiredPlugin extends Plugin
 		return false;
 	}
 
+	private boolean isCanoeStation(String target)
+	{
+		return "Canoe Station".equalsIgnoreCase(target);
+	}
+
 	private boolean hasAxeForTarget(String target)
 	{
 		return ANY_AXE.fulfilledBy(playerItems)
-			|| "Canoe Station".equals(target) && hasStoredCanoeAxe();
+			|| isCanoeStation(target) && hasStoredCanoeAxe();
 	}
 
 	private static final AnyRequirementCollection ANY_AXE = any("Any Axe",
@@ -192,9 +197,10 @@ public class ToolRequiredPlugin extends Plugin
 			if (entry.getType() != GAME_OBJECT_FIRST_OPTION) {continue;}
 			if (config.chopDown() && !seasonalRelic) {
 				String target = removeTags(entry.getTarget());
+				boolean isTreeTarget = target.contains("ree") || chopOverrides.contains(target) || isCanoeStation(target);
 				// target.contains("ree") is Tree check (without the T because of case-sensitive)
 				if (entry.getOption().startsWith("Chop")
-					&& (target.contains("ree") || chopOverrides.contains(target))
+					&& isTreeTarget
 					&& !hasAxeForTarget(target)) {
 					root.removeMenuEntry(entry);
 					// removeMenuEntry will set `entry` to a different, potentially to-be-removed option,
